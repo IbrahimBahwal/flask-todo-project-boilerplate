@@ -25,7 +25,7 @@ def update_todo(todo_id, update_data):
 
     return task
 
-def delete_todo(todo_id)
+def delete_todo(todo_id):
     task = get_todo_by_id(todo_id)
     
     tasks = helpers.read_db_file()
