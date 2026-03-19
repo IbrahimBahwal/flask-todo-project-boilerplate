@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import config
+
 import crud
 
 
@@ -22,23 +23,35 @@ def create_todo_route():
 
     return {}
 
-@app.route("/todos/<todo_id>", methods=["GET"])
+@app.route("/todos/<int:todo_id>", methods=["GET"])
 def get_todo_route(todo_id):
     # get
-    task = get_todo_by_id()# task or None(not found)
+    task = crud.get_todo_by_id(todo_id)# task or None(not found)
     if task is None:
-        return {"error":"Task not found"}, 404
-    return{}
+        return jsonify({"error":"Task not found"}), 404
+    
+    return jsonify(task), 200
 
-@app.route("/todos", methods=["PUT"])
-def update_todo_route():
+@app.route("/todos/<int:todo_id>", methods=["PUT"])
+def update_todo_route(todo_id):
     # update
-    return{}
+    task = crud.get_todo_by_id(todo_id)# task or None(not found)
+    if task is None:
+        return jsonify({"error":"Task not found"}), 404
+    
+    updata_data = request.get_json()
+    updated_task = crud.update_todo(todo_id, updata_data)
+    return jsonify(updated_task)
 
-@app.route("/todos", methods=["DELETE"])
-def delete_todo_route():
+@app.route("/todos/<int:todo_id>", methods=["DELETE"])
+def delete_todo_route(todo_id):
     # delete
-    return{}
+    task = crud.get_todo_by_id(todo_id)# task or None(not found)
+    if task is None:
+        return jsonify({"error":"Task not found"}), 404
+    crud.delete_todo(todo_id)
+    
+    return jsonify({"message":"Delete process success"})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
